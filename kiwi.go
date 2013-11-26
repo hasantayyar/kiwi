@@ -24,6 +24,8 @@ func main() {
 	// Serve Static Files via "/"
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(Config.StaticDir + "/")))
 
+	fmt.Println(Config)
+
 	err = http.ListenAndServe(":"+strconv.Itoa(Config.Port), r)
 	if err != nil {
 		fmt.Println(err)
