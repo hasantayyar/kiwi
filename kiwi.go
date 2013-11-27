@@ -1,25 +1,32 @@
 package main
 
 import (
-	"bitbucket.org/kardianos/osext"
-	"encoding/json"
 	"fmt"
-	"flag"
-	"path"
-	"io/ioutil"
+	"github.com/gorilla/mux"
+	"net/http"
+	"strconv"	
 )
 
+var Config Configuration
+const defaultConfigFile string = "kiwi.go"
+
 func main() {
-	var conffile string
-	current, _ := osext.Executable()
-	current = path.Dir(current)
-
-	flag.StringVar(&conffile, "config", current+"/kiwi.json", "Configuration File")
-	flag.Parse()
-
-	c, err := ioutil.ReadFile(conffile)
+	// Requires &Config to be accessible
+	err := ImportConf()
 	if err != nil {
-		fmt.Println("Error Reading Config File ", err)
-		return 1
+		fmt.Println("Error Reading configuration: ", err)
+	}
+
+	// Initiate the web app
+	r := mux.NewRouter()
+	//r.HandleFunc("/", App)
+
+	// Serve Static Files via "/"
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(Config.StaticDir + "/")))
+
+	err = http.ListenAndServe(":"+strconv.Itoa(Config.Port), r)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 }
