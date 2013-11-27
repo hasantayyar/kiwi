@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
-	"strconv"	
+	"strconv"
 )
 
 var Config Configuration
@@ -19,7 +19,9 @@ func main() {
 
 	// Initiate the web app
 	r := mux.NewRouter()
-	//r.HandleFunc("/", App)
+	r.HandleFunc("/", errorAdapter(HomepageHandler))
+	r.HandleFunc("/login", errorAdapter(LoginHandler))
+	r.HandleFunc("/talk", errorAdapter(AppHandler))
 
 	// Serve Static Files via "/"
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(Config.StaticDir + "/")))
